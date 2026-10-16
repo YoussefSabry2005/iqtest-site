@@ -17,13 +17,14 @@ jobs:
       - name: Check endpoints (3 attempts each)
         id: check
         run: |
+          set +e  # a slow attempt must not abort the retries
           fail=""
           for u in "$SITE_URL/" "$SITE_URL/test/" "$SITE_URL/data/bank.json" $EXTRA_HEALTH_URLS; do
-            ok=0; for i in 1 2 3; do code=$(curl -s -o /tmp/b -w '%{http_code}' --max-time 20 "$u"); [ "$code" = "200" ] && { case "$u" in *health*) grep -q '"ok":true' /tmp/b && ok=1;; *) ok=1;; esac; }; [ $ok = 1 ] && break; sleep 20; done
+            ok=0; for i in 1 2 3; do code=$(curl -s -o /tmp/b -w '%{http_code}' --max-time 30 "$u" || true); [ "$code" = "200" ] && { case "$u" in *health*) grep -q '"ok":true' /tmp/b && ok=1;; *) ok=1;; esac; }; [ $ok = 1 ] && break; sleep 20; done
             [ $ok = 1 ] || fail="$fail $u(HTTP $code)"
           done
           echo "fail=$fail" >> "$GITHUB_OUTPUT"
-          [ -z "$fail" ]
+          [ -z "$fail" ] || exit 1
       - name: Open/update outage issue (emailed to the owner)
         if: failure()
         env: { FAILED: "${{ steps.check.outputs.fail }}" }
