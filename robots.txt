@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /share/
+Sitemap: https://youssefsabry2005.github.io/iqtest-site/sitemap.xml
