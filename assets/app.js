@@ -106,7 +106,7 @@ function renderResult(root, { items, answers, responses, theta, rep }) {
   const correct = responses.filter((r) => r.correct).length;
   const band = Math.max(70, Math.min(145, Math.round(rep.index / 5) * 5));
   const shareUrl = `${CFG.baseUrl}/share/${band}/`;
-  const shareText = `I scored around ${rep.index} on the ${CFG.brand} reasoning test. Can you beat it?`;
+  const shareText = `I scored around ${rep.index} on the ${CFG.brand}. Challenge your brain. Can you beat it?`;
   const bySkill = {};
   for (const r of responses) { bySkill[r.skill] ??= { c: 0, n: 0 }; bySkill[r.skill].n++; if (r.correct) bySkill[r.skill].c++; }
   root.innerHTML = `
