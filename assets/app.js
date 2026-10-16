@@ -179,6 +179,22 @@ function fillAds() {
   });
 }
 
+// ---------------------------------------------------------------- contact form
+const cf = document.getElementById('contact-form');
+if (cf) cf.addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  const st = document.getElementById('c-status');
+  const data = Object.fromEntries(new FormData(cf));
+  if ((data.message || '').trim().length < 5) { st.textContent = 'Please write a message of at least a few words.'; return; }
+  st.textContent = 'Sending…';
+  try {
+    const r = await fetch(`${CFG.collectorUrl}/a/contact`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ site: 'iq', page: document.referrer ? new URL(document.referrer).pathname : '', ...data }) });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok && j.ok) { cf.reset(); st.textContent = 'Thanks! Your message was sent.'; }
+    else st.textContent = j.reason === 'bad email' ? 'That email address looks invalid.' : r.status === 429 ? 'Too many messages; please try again later.' : 'Sorry, sending failed. Please try again later.';
+  } catch { st.textContent = 'Sorry, sending failed. Please try again later.'; }
+});
+
 // ---------------------------------------------------------------- boot
 const t = document.getElementById('test-app');
 if (t) runTest(t).catch((e) => { t.innerHTML = '<p class="notice">Sorry, the test failed to load. Please refresh.</p>'; beacon('error', { msg: e.message }); });
