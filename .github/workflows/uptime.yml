@@ -26,7 +26,7 @@ jobs:
           echo "fail=$fail" >> "$GITHUB_OUTPUT"
           [ -z "$fail" ] || exit 1
       - name: Open/update outage issue (emailed to the owner)
-        if: failure()
+        if: failure() && vars.NOTIFY_ISSUES == 'on'
         env: { FAILED: "${{ steps.check.outputs.fail }}" }
         run: |
           gh label create outage --repo "$GITHUB_REPOSITORY" --color B60205 2>/dev/null || true
